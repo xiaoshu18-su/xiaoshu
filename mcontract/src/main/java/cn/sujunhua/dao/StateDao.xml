@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.sujunhua.dao.StateDao">
+   <cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+   <!-- 模糊查询 -->
+   <select id="selectStateLikeName" parameterType="String" resultType="State">
+      SELECT * FROM t_state s
+      <where>
+         <if test="state_name != null and state_name != ''">
+            s.state_name LIKE "%"#{state_name}"%"
+         </if>
+      </where>
+   </select>
+   <select id="selectStateByName" parameterType="String" resultType="State">
+       SELECT * FROM t_state s where
+            s.state_name = #{state_name}
+   </select>
+   <select id="selectAllState" resultType="State">
+       SELECT * FROM t_state s
+   </select>
+</mapper>

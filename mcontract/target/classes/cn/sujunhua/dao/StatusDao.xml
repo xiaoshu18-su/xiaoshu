@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.sujunhua.dao.StatusDao">
+	<!-- 开启二级缓存 -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<select id="selectStatusByName" resultType="Status"
+		parameterType="String">
+		select * from t_status where status_name=#{status_name}
+	</select>
+	<select id="selectStatusByID" parameterType="Integer" resultType="Status">
+	    select * from t_status where status_id=#{status_id}
+	</select>
+	<select id="selectAllStatus" resultType="Status">
+	    select * from t_status
+	</select>
+</mapper>

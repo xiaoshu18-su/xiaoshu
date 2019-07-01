@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.sujunhua.dao.DepartmentDao">
+   <!-- 开启二级缓存 -->
+   <!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+    <select id="selectDepartment" resultType="Department">
+      SELECT * FROM t_department
+    </select>
+    
+    <select id="findDepartmentByid" resultType="Department" parameterType="Integer">
+      SELECT * FROM t_department WHERE t_department.department_id=#{department_id}
+    </select>
+    
+    <select id="selectDepartmentOrderdesc" resultType="Department">
+      SELECT * FROM t_department d ORDER BY d.department_time DESC
+    </select>
+    
+    <select id="checkDeptexit" parameterType="String" resultType="Department">
+      SELECT * FROM t_department d where d.department_name=#{department_name}
+    </select>
+    
+    <insert id="addDepartment" parameterType="Department">
+      INSERT INTO t_department(
+		department_name,
+		department_time
+		)
+		VALUES(
+		#{department_name},
+		NOW()
+		)
+    </insert>
+    
+    <update id="updateDeptByid" parameterType="Department">
+      UPDATE t_department d
+		SET d.department_name=#{department_name}
+		WHERE d.department_id=#{department_id}
+    </update>
+    
+    <select id="selectDeptCount" resultType="Integer">
+       SELECT COUNT(department_id) FROM t_department
+    </select>
+    
+    <delete id="deleteDeptByid" parameterType="Integer">
+      DELETE FROM t_department
+    <where>
+      <if test="department_id">
+         t_department.department_id=#{department_id}
+      </if>
+    </where>
+    </delete>
+    
+    <!-- 自定义resultmap -->
+    <resultMap type="Department" id="selectdeptandusersmap">
+       <id property="department_id" column="department_id"/>
+       <result property="department_name" column="department_name"/>
+       <collection property="user" ofType="User">
+          <result property="user_name" column="user_name"/>
+          <result property="user_type" column="user_type"/>
+       </collection>
+    </resultMap>
+    
+</mapper>

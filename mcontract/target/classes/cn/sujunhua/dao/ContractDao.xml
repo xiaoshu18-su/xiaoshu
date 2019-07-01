@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.sujunhua.dao.ContractDao">
+   <!-- 开启二级缓存 -->
+   <!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+	<insert id="addContract" parameterType="Contract">
+		INSERT INTO t_contract(
+		contract_id,
+		contract_name,
+		contract_parta,
+		contract_partb,
+		contract_partbrepresentative,
+		contract_partbaddress,
+		contract_partbtelephone,
+		contract_partbsigningtime,
+		contract_startime,
+		contract_endtime,
+		contract_advancetime,
+		contract_collectiontime,
+		contract_money,
+		contract_accumulatedreceipts,
+		contract_accumulatedarrears,
+		contract_file,
+		contract_filename,
+		contract_state,
+		contract_status,
+		contract_modify,
+		contract_modify_time,
+		contract_remarks,
+		contract_user,
+		contract_trackstatus
+		)
+		VALUES(
+		#{contract_id},
+		#{contract_name},
+		#{contract_parta},
+		#{contract_partb},
+		#{contract_partbrepresentative},
+		#{contract_partbaddress},
+		#{contract_partbtelephone},
+		#{contract_partbsigningtime},
+		#{contract_startime},
+		#{contract_endtime},
+		#{contract_advancetime},
+		#{contract_collectiontime},
+		#{contract_money},
+		#{contract_accumulatedreceipts},
+		#{contract_accumulatedarrears},
+		#{contract_file},
+		#{contract_filename},
+		#{contract_state},
+		#{contract_status},
+		#{contract_modify},
+		#{contract_modify_time},
+		#{contract_remarks},
+		#{contract_user},
+		#{contract_trackstatus}
+		)
+	</insert>
+	
+	<!-- updatecontract_accumulatedarrears -->
+	<update id="updatecontract_accumulatedarrears">
+	   UPDATE t_contract c
+		SET c.contract_accumulatedarrears=0
+		WHERE c.contract_money=c.contract_accumulatedreceipts
+	</update>
+	<!-- 自定义返回类型 -->
+	<resultMap type="Contract" id="selectcontract">
+	   <id column="contract_id" property="contract_id"/>
+	   <result column="contract_name" property="contract_name"/>
+	   <result column="contract_parta" property="contract_parta"/>
+	   <result column="contract_partb" property="contract_partb"/>
+	   <result column="contract_partbrepresentative" property="contract_partbrepresentative"/>
+	   <result column="contract_partbaddress" property="contract_partbaddress"/>
+	   <result column="contract_partbtelephone" property="contract_partbtelephone"/>
+	   <result column="contract_partbsigningtime" property="contract_partbsigningtime"/>
+	   <result column="contract_startime" property="contract_startime"/>
+	   <result column="contract_endtime" property="contract_endtime"/>
+	   <result column="contract_advancetime" property="contract_advancetime"/>
+	   <result column="contract_collectiontime" property="contract_collectiontime"/>
+	   <result column="contract_money" property="contract_money"/>
+	   <result column="contract_accumulatedreceipts" property="contract_accumulatedreceipts"/>
+	   <result column="contract_accumulatedarrears" property="contract_accumulatedarrears"/>
+	   <result column="contract_file" property="contract_file"/>
+	   <result column="contract_filename" property="contract_filename"/>
+	   <result column="contract_state" property="contract_state"/>
+	   <result column="contract_status" property="contract_status"/>
+	   <result column="contract_modify" property="contract_modify"/>
+	   <result column="contract_modify_time" property="contract_modify_time"/>
+	   <result column="contract_remarks" property="contract_remarks"/>
+	   <result column="contract_user" property="contract_user"/>
+	   <result column="contract_trackstatus" property="contract_trackstatus"/>
+	   <association property="user" javaType="cn.sujunhua.pojo.User">
+		   <id column="user_id" property="user_id"/>
+		   <result column="user_name" property="user_name"/>
+	   </association>
+	   <association property="state" javaType="cn.sujunhua.pojo.State">
+		   <id column="state_id" property="state_id"/>
+		   <result column="state_name" property="state_name"/>
+	   </association>
+	   <association property="modify" javaType="cn.sujunhua.pojo.Modify">
+		   <id column="modify_id" property="modify_id"/>
+		   <result column="modify_name" property="modify_name"/>
+	   </association>
+	   <association property="status" javaType="cn.sujunhua.pojo.Status">
+		   <id column="status_id" property="status_id"/>
+		   <result column="status_name" property="status_name"/>
+	   </association>
+	   <collection property="tracks" ofType="cn.sujunhua.pojo.Track">
+	       <id column="track_id" property="track_id"/>
+	       <result column="track_userid" property="track_userid"/>
+	       <result column="track_user" property="track_user"/>
+	       <result column="track_contractid" property="track_contractid"/>
+	       <result column="track_partb" property="track_partb"/>
+	       <result column="track_money" property="track_money"/>
+	       <result column="track_collectiondate" property="track_collectiondate"/>
+	       <result column="track_amountreceived" property="track_amountreceived"/>
+	       <result column="tract_accumulatedreceipts" property="tract_accumulatedreceipts"/>
+	       <result column="tract_accumulatedarrears" property="tract_accumulatedarrears"/>
+	       <result column="tract_remarks" property="tract_remarks"/>
+	       <association property="user" javaType="cn.sujunhua.pojo.User">
+		       <id column="user_id" property="user_id"/>
+			   <result column="user_name" property="user_name"/>
+	       </association>
+	   </collection>
+	</resultMap>
+
+	<select id="selectContract" resultMap="selectcontract">
+		SELECT c.*,t.*,s.*,m.*,u.user_id,u.user_name
+		FROM t_contract c
+		LEFT OUTER JOIN t_status t
+		ON c.contract_status=t.status_id
+		LEFT OUTER JOIN t_state s
+		ON c.contract_state=s.state_id
+		LEFT OUTER JOIN t_modify m
+		ON c.contract_modify=m.modify_id
+		LEFT OUTER JOIN t_user u
+		ON c.contract_user=u.user_id
+		<where>
+		  <if test="partbinformation != null and partbinformation != ''">
+		     (
+		      c.contract_id LIKE "%"#{partbinformation}"%" 
+		      or c.contract_name LIKE "%"#{partbinformation}"%"
+		      or contract_partb LIKE "%"#{partbinformation}"%"
+		      or contract_partbrepresentative LIKE "%"#{partbinformation}"%"
+		      or contract_partbtelephone LIKE "%"#{partbinformation}"%"
+		      )
+		  </if>
+		  <if test="contract_state != null and contract_state != 0">
+		      and c.contract_state = #{contract_state}
+		  </if>
+		  <if test="contract_status != null and contract_status != 0">
+		      and c.contract_status = #{contract_status}
+		  </if>
+		  <if test="startsigningtime != null and startsigningtime != ''">
+		      and c.contract_partbsigningtime&gt;=#{startsigningtime}
+		  </if>
+		  <if test="endsigningtime != null and endsigningtime != ''">
+		      and c.contract_partbsigningtime&lt;=#{endsigningtime}
+		  </if>
+		</where>
+	</select>
+	
+	<select id="selectContractByStatus" resultMap="selectcontract">
+		SELECT c.*,t.*,s.*,m.*,u.user_id,u.user_name
+		FROM t_contract c
+		LEFT OUTER JOIN t_status t
+		ON c.contract_status=t.status_id
+		LEFT OUTER JOIN t_state s
+		ON c.contract_state=s.state_id
+		LEFT OUTER JOIN t_modify m
+		ON c.contract_modify=m.modify_id
+		LEFT OUTER JOIN t_user u
+		ON c.contract_user=u.user_id
+		where contract_state=#{contract_state}
+		and contract_status in
+		<foreach collection="contract_status" index="idx" item="status" open="(" separator="," close=")">
+		    #{status}
+		</foreach>
+	</select>
+
+	<delete id="deleteContractByid" parameterType="String">
+		DELETE FROM t_contract WHERE t_contract.contract_id=#{contract_id}
+	</delete>
+    <!-- 根据id查出合同的详细信息 -->
+	<select id="findConractByid" parameterType="String"
+		resultMap="selectcontract">
+		SELECT c.*,t.*,s.*,m.*,track.*,u.user_id,u.user_name
+		FROM t_contract c
+		LEFT OUTER JOIN t_status t
+		ON c.contract_status=t.status_id
+		LEFT OUTER JOIN t_state s
+		ON c.contract_state=s.state_id
+		LEFT OUTER JOIN t_modify m
+		ON c.contract_modify=m.modify_id
+	    LEFT OUTER JOIN t_track track
+	    ON c.contract_id=track.track_contractid
+		LEFT OUTER JOIN t_user u
+		ON c.contract_user=u.user_id 
+		WHERE contract_id=#{contract_id}
+	</select>
+	
+	<!-- 修改合同方法 -->
+	<update id="updateContractByid" parameterType="Contract">
+	    UPDATE t_contract 
+	    <set>
+	       <if test="contract_name!=null and contract_name!=''">
+	          contract_name=#{contract_name},
+	       </if>
+	       <if test="contract_parta!=null and contract_parta!=''">
+	          contract_parta=#{contract_parta},
+	       </if>
+	       <if test="contract_partb!=null and contract_partb!=''">
+	          contract_partb=#{contract_partb},
+	       </if>
+	       <if test="contract_partbrepresentative!=null and contract_partbrepresentative!=''">
+	          contract_partbrepresentative=#{contract_partbrepresentative},
+	       </if>
+	       <if test="contract_partbaddress!=null and contract_partbaddress!=''">
+	          contract_partbaddress=#{contract_partbaddress},
+	       </if>
+	       <if test="contract_partbtelephone!=null and contract_partbtelephone!=''">
+	          contract_partbtelephone=#{contract_partbtelephone},
+	       </if>
+	       <if test="contract_partbsigningtime!=null and contract_partbsigningtime!=''">
+	          contract_partbsigningtime=#{contract_partbsigningtime},
+	       </if>
+	       <if test="contract_startime!=null and contract_startime!=''">
+	          contract_startime=#{contract_startime},
+	       </if>
+	       <if test="contract_endtime!=null and contract_endtime!=''">
+	          contract_endtime=#{contract_endtime},
+	       </if>
+	       <if test="contract_advancetime!=null and contract_advancetime!=''">
+	          contract_advancetime=#{contract_advancetime},
+	       </if>
+	       <if test="contract_collectiontime!=null and contract_collectiontime!=''">
+	          contract_collectiontime=#{contract_collectiontime},
+	       </if>
+	       <if test="contract_money!=null and contract_money!=''">
+	          contract_money=#{contract_money},
+	       </if>
+	       <if test="contract_accumulatedreceipts!=null and contract_accumulatedreceipts!=''">
+	          contract_accumulatedreceipts=#{contract_accumulatedreceipts},
+	       </if>
+	       <if test="contract_accumulatedarrears!=null and contract_accumulatedarrears!=''">
+	          contract_accumulatedarrears=#{contract_accumulatedarrears},
+	       </if>
+	       <if test="contract_file!=null and contract_file!=''">
+	          contract_file=#{contract_file},
+	       </if>
+	       <if test="contract_filename!=null and contract_filename!=''">
+	          contract_filename=#{contract_filename},
+	       </if>
+	       <if test="contract_remarks!=null and contract_remarks!=''">
+	          contract_remarks=#{contract_remarks},
+	       </if>
+	       <if test="contract_modify_time!=null and contract_modify_time!=''">
+	          contract_modify_time=#{contract_modify_time},
+	       </if>
+	       <if test="contract_state!=null">
+	          contract_state=#{contract_state},
+	       </if>
+	       <if test="contract_status!=null">
+	          contract_status=#{contract_status},
+	       </if>
+	       <if test="contract_modify!=null">
+	          contract_modify=#{contract_modify},
+	       </if>
+	       <if test="contract_user!=null">
+	          contract_user=#{contract_user},
+	       </if>
+	       <if test="contract_trackstatus!=null">
+	          contract_trackstatus=#{contract_trackstatus},
+	       </if>
+	    </set>
+	    WHERE contract_id=#{contract_id}
+	</update>
+	
+	<!-- findContractFileByid -->
+    <select id="findContractFileByid" parameterType="String" resultType="Contract">
+       select c.contract_file from t_contract c where contract_id=#{contract_id}
+    </select>
+
+	<select id="selectchartbyday" parameterType="Integer"
+		resultType="Contract">
+		SELECT * FROM t_contract c
+		where DATE_SUB(CURDATE(), INTERVAL #{day} DAY) &lt;=
+		date(c.contract_partbsigningtime)
+		ORDER BY c.contract_partbsigningtime ASC
+	</select>
+	
+	<select id="selectmonth" parameterType="Integer" resultType="Contract">
+	    SELECT * FROM t_contract c 
+	    WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( c.contract_partbsigningtime, '%Y%m' ) ) =#{count}
+	    ORDER BY c.contract_partbsigningtime ASC
+	</select>
+    
+    <!-- selectContractInID -->
+    <select id="selectContractInID" resultType="contract">
+       select c.*
+       from t_contract c
+       <where>
+          <if test="contractids!=null">
+             c.contract_id in
+             <foreach collection="contractids" item="contractid" index="idx" open="(" separator="," close=")">
+                #{contractid}
+             </foreach>
+          </if>
+       </where>
+    </select>
+    
+    <!-- updateContractsInID -->
+    <update id="updateContractsInID">
+      UPDATE t_contract SET contract_status=#{contract_status}
+		<!-- WHERE contract_id IN(20190421211559378) -->
+		<where>
+		   <if test="contractids!=null">
+		      contract_id IN
+		      <foreach collection="contractids" index="idx" item="contractid" open="(" separator="," close=")">
+		          #{contractid}
+		      </foreach>
+		   </if>
+		</where>
+    </update>
+    <!-- selectContractlimit -->
+    <select id="selectContractlimit" resultType="Contract">
+       select * from t_contract c ORDER BY c.contract_id DESC LIMIT 7
+    </select>
+    
+    <!-- 查本年的合同 -->
+    <select id="selecthisyear" resultType="Contract">
+       select * from t_contract c 
+       where YEAR(c.contract_partbsigningtime)=YEAR(NOW()) 
+       ORDER BY C.contract_partbsigningtime
+    </select>
+    <!-- 查上一年或更前的 -->
+    <select id="selectlastyear" parameterType="Integer" resultType="Contract">
+       select * from t_contract c 
+       where year(c.contract_partbsigningtime)=year(date_sub(now(),interval #{count} year)) 
+       ORDER BY C.contract_partbsigningtime
+    </select>
+    <!-- 查询所有合同，根据收款状态排序 -->
+    <select id="selectContractorderbystatus" resultType="Contract">
+       select * from t_contract c ORDER BY c.contract_status
+    </select>
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.sujunhua.dao.EmailDao">
+   <!-- 开启二级缓存 -->
+   <!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+   <!-- 发送邮件 -->
+    <insert id="sendemail" parameterType="Email">
+      INSERT INTO
+		t_email(
+		t_email.email_send,
+		t_email.email_receive,
+		t_email.email_theme,
+		t_email.email_content,
+		t_email.email_file,
+		t_email.email_namefile,
+		t_email.email_datetime
+		)
+		VALUES(
+		#{email_send},
+		#{email_receive},
+		#{email_theme},
+		#{email_content},
+		#{email_file},
+		#{email_namefile},
+		#{email_datetime}
+		)
+    </insert>
+    
+    <!-- 当前用户查看邮箱 -->
+    <select id="selectAllemailByreceive" resultType="Email" parameterType="String">
+       SELECT e.email_id,e.email_send,e.email_theme,e.email_datetime
+		FROM t_email e
+		WHERE e.email_receive=#{email_receive}
+    </select>
+    
+    <!-- 查看邮件 -->
+    <select id="selectemailByid" resultType="Email" parameterType="Integer">
+       SELECT *
+		FROM t_email e
+		WHERE e.email_id=#{email_id}
+    </select>
+    
+    <delete id="deleteemailByid" parameterType="Integer">
+      DELETE FROM t_email WHERE t_email.email_id=#{email_id}
+    </delete>
+    
+    <select id="selectcountemail" resultType="Integer" parameterType="String">
+      SELECT COUNT(e.email_id)
+		FROM t_email e
+		WHERE e.email_receive=#{email_receive}
+    </select>
+    
+    <!-- 查找最新的一条信息 -->
+    <select id="selectNewEmail" parameterType="String" resultType="Email">
+       SELECT e.email_send,e.email_content,e.email_datetime
+		FROM t_email e
+		WHERE e.email_receive=#{email_receive}
+		ORDER BY email_datetime DESC
+		LIMIT 1
+    </select>
+    <select id="selectEfileByid" parameterType="Integer" resultType="Email">
+      SELECT e.email_file FROM t_email e WHERE e.email_id=#{email_id}
+    </select>
+</mapper>

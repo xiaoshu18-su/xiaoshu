@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.sujunhua.dao.UserDao">
+   <!-- 开启二级缓存 -->
+   <!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+<!-- 查询用户详细信息     自定义返回类型 -->
+    <resultMap type="user" id="useranddepartment">
+        <id column="user_id"  property="user_id" />
+        <result column="user_address"  property="user_address" />
+        <result column="user_birthday"  property="user_birthday" />
+        <result column="user_education"  property="user_education" />
+        <result column="user_email"  property="user_email" />
+        <result column="user_entry"  property="user_entry" />
+        <result column="user_id_card"  property="user_id_card" />
+        <result column="user_image"  property="user_image" />
+        <result column="user_pwd"  property="user_pwd" />
+        <result column="user_name"  property="user_name" />
+        <result column="user_nation"  property="user_nation" />
+        <result column="user_part_id"  property="user_part_id" />
+        <result column="user_phone"  property="user_phone" />
+        <result column="user_political"  property="user_political" />
+        <result column="user_qq_no"  property="user_qq_no" />
+        <result column="user_sex"  property="user_sex" />
+        <result column="user_type"  property="user_type" />
+        <result column="user_status"  property="user_status" />
+        <result column="user_image"  property="user_image" />
+        <result column="user_secret_id"  property="user_secret_id" />
+        <result column="user_secret_answer"  property="user_secret_answer" />
+        <association property="department" javaType="cn.sujunhua.pojo.Department">
+		<id column="department_id"  property="department_id" />
+		<result column="department_name"  property="department_name" />
+		</association>
+		<association property="usertype" javaType="cn.sujunhua.pojo.Usertype">
+		<id column="usertype_id"  property="usertype_id" />
+		<result column="usertype_name"  property="usertype_name" />
+		</association>
+		<association property="secret" javaType="cn.sujunhua.pojo.Secret">
+		<id column="secret_id"  property="secret_id" />
+		<result column="secret_name"  property="secret_name" />
+		</association>
+    </resultMap>
+  
+  <!-- 用户登录方法 -->
+  <select id="userLogin" resultMap="useranddepartment" parameterType="String">
+        SELECT u.*,t.*
+		FROM t_user u
+		INNER JOIN t_usertype t
+		ON u.user_type=t.usertype_id
+		AND (
+		(BINARY u.user_email=#{username} AND BINARY u.user_pwd=#{password})
+		OR (BINARY u.user_phone=#{username} AND BINARY u.user_pwd=#{password})
+		)
+		AND u.user_status=0
+  </select>
+  
+      <!-- 简单查询用户 -->
+	  <select id="selectUser" resultMap="useranddepartment">
+		SELECT
+		u.user_id,
+		u.user_name,
+		u.user_sex,
+		u.user_email,
+		u.user_status,
+		u.user_type,
+	    u.user_part_id,
+		d.*,
+		t.*
+		FROM t_user u
+		LEFT JOIN t_department d
+		ON u.user_part_id=d.department_id
+		LEFT JOIN t_usertype t
+		ON u.user_type=t.usertype_id
+	  </select>
+	  
+    <!-- poiselectUser -->
+    <select id="poiselectUser" resultMap="useranddepartment">
+		SELECT u.*,d.*,t.*
+		FROM t_user u
+		LEFT JOIN t_department d
+		ON u.user_part_id=d.department_id
+		LEFT JOIN t_usertype t
+		ON u.user_type=t.usertype_id
+  </select>
+  
+  <!-- 根据id查询用户详细信息-->
+  <select id="selectUserByid" resultMap="useranddepartment" parameterType="Integer">
+     	SELECT u.*,d.*,t.*
+		FROM t_user u
+		LEFT JOIN t_department d
+		ON u.user_part_id=d.department_id
+		LEFT JOIN t_usertype t
+		ON u.user_type=t.usertype_id
+		LEFT JOIN t_secret s
+		ON u.user_secret_id=s.secret_id
+		where u.user_id=#{user_id}
+  </select>
+  
+  <!-- 根据id查出员工类型 -->
+  <select id="selectUsertypeByid" parameterType="Integer" resultType="User">
+     select u.user_type from t_user u where u.user_id=#{user_id}
+  </select>
+  
+  <!-- 查询员工的年龄 -->
+  <select id="finduserageByid" parameterType="Integer" resultType="Integer">
+    SELECT ROUND(DATEDIFF(CURDATE(), u.user_birthday)/365.2422) age
+	FROM t_user u
+	WHERE u.user_id=#{user_id}
+  </select>
+  
+  <select id="check_email_idcard_phone" resultType="User">
+	  SELECT u.user_email,u.user_id_card,u.user_phone FROM t_user u
+  </select>
+  
+  <select id="check_email_receive" resultType="User" parameterType="String">
+        SELECT u.user_email
+		FROM t_user u
+		WHERE u.user_email=#{user_email}
+  </select>
+  
+  <insert id="addUser" parameterType="User">
+	  INSERT INTO t_user(
+		  t_user.user_name,
+		  t_user.user_sex,
+		  t_user.user_address,
+		  t_user.user_email,
+		  t_user.user_pwd,
+		  t_user.user_id_card,
+		  t_user.user_phone,
+		  t_user.user_type,
+		  t_user.user_part_id,
+		  t_user.user_qq_no,
+		  t_user.user_education,
+		  t_user.user_political,
+		  t_user.user_nation,
+		  t_user.user_birthday,
+		  t_user.user_entry
+	  )
+	  VALUES (
+		  #{user_name},
+		  #{user_sex},
+		  #{user_address},
+		  #{user_email},
+		  #{user_pwd},
+		  #{user_id_card},
+		  #{user_phone},
+		  #{user_type},
+		  #{user_part_id},
+		  #{user_qq_no},
+		  #{user_education},
+		  #{user_political},
+		  #{user_nation},
+		  #{user_birthday},
+		  #{user_entry}
+	  )
+  </insert>
+	<update id="updateUserByid" parameterType="User">
+		UPDATE t_user u
+		<set>
+		<if test="user_name != null">u.user_name=#{user_name},</if>
+		<if test="user_sex != null">u.user_sex=#{user_sex},</if>
+		<if test="user_address != null">u.user_address=#{user_address},</if>
+		<if test="user_email != null">u.user_email=#{user_email},</if>
+		<if test="user_pwd != null">u.user_pwd=#{user_pwd},</if>
+		<if test="user_id_card != null">u.user_id_card=#{user_id_card},</if>
+		<if test="user_phone != null">u.user_phone=#{user_phone},</if>
+		<if test="user_type != null">u.user_type=#{user_type},</if>
+		<if test="user_part_id != null">u.user_part_id=#{user_part_id},</if>
+		<if test="user_status != null">u.user_status=#{user_status},</if>
+		<if test="user_qq_no != null">u.user_qq_no=#{user_qq_no},</if>
+		<if test="user_education != null">u.user_education=#{user_education},</if>
+		<if test="user_political != null">u.user_political=#{user_political},</if>
+		<if test="user_nation != null">u.user_nation=#{user_nation},</if>
+		<if test="user_birthday != null">u.user_birthday=#{user_birthday},</if>
+		<if test="user_entry != null">u.user_entry=#{user_entry},</if>
+		<if test="user_secret_id != null and user_secret_id !=''">u.user_secret_id=#{user_secret_id},</if>
+		<if test="user_secret_answer != null and user_secret_answer !=''">u.user_secret_answer=#{user_secret_answer},</if>
+		</set>
+		WHERE 
+		u.user_id=#{user_id}
+	</update>
+  
+  <delete id="delectUserByid" parameterType="Integer">
+    <!-- DELETE FROM t_user WHERE t_user.user_id=#{user_id} -->
+    DELETE FROM t_user where
+         t_user.user_id=#{user_id}
+  </delete>
+  
+  <select id="findsendemail" resultType="User" parameterType="String">
+     <!-- SELECT u.user_name
+		FROM t_user u
+		WHERE u.user_email=#{user_email} -->
+		SELECT u.user_name
+		FROM t_user u
+		<where>
+		  <if test="user_email!=null and user_email!=''">
+		    u.user_email=#{user_email}
+		  </if>
+		</where>
+  </select>
+  
+  <update id="updateimg" parameterType="User">
+     <!-- UPDATE t_user 
+		SET t_user.user_image=#{user_image}
+		WHERE t_user.user_id=#{user_id} -->
+		UPDATE t_user
+		<set>
+		   <if test="user_image!=null and user_image!=''">
+		      t_user.user_image=#{user_image}
+		   </if>
+		</set>
+		<where>
+		   <if test="user_id!=null">
+		      t_user.user_id=#{user_id}
+		   </if>
+		</where>
+  </update>
+  
+  <!-- 找回密码方法 -->
+  <select id="findUserPwd" resultType="User">
+	SELECT u.user_pwd
+	FROM t_user u
+	WHERE (u.user_email=#{username}
+	OR u.user_phone=#{username})
+	AND u.user_secret_id=#{user_secret_id}
+	AND u.user_secret_answer=#{user_secret_answer}
+  </select>
+  <!-- 修改密码 -->
+  <update id="updateUserPwd">
+     UPDATE t_user u 
+     SET u.user_pwd=#{newpwd} 
+     WHERE u.user_id=#{user_id} 
+     AND u.user_pwd=#{pwd1}
+  </update>
+  
+  <select id="selectUserEmail" parameterType="String" resultType="User">
+     SELECT u.user_name,u.user_image
+		FROM t_user u
+		WHERE u.user_email=#{user_email}
+  </select>
+  
+  <!--SQL片段  -->
+    <sql id="selectUserListWhere">
+        <where>
+	       <if test="user_email != null and user_email != ''" >
+	           user_email like "%"#{user_email}"%"
+	       </if>
+	       <if test="user_email == null or user_email == ''" >
+	           user_email = null
+	       </if>
+        </where>
+    </sql>
+  
+  <!-- 输入邮箱的提示 -->
+  <select id="selectEmailByemail" parameterType="String" resultType="User">
+     SELECT t_user.user_email
+		FROM t_user 
+		<include refid="selectUserListWhere"/>
+  </select>
+  
+  <update id="updateUserDeptId" parameterType="Integer">
+     UPDATE t_user u
+		SET
+		u.user_part_id=#{deptid1}
+		WHERE u.user_part_id=#{deptid2}
+  </update>
+  
+  <select id="selectCountBydeptId" parameterType="Integer" resultType="Integer">
+    SELECT COUNT(t_user.user_id) FROM t_user WHERE user_part_id=#{deptID}
+  </select>
+  
+  <select id="checkUser" parameterType="String" resultType="User">
+     SELECT u.user_id FROM t_user u WHERE u.user_id=#{user_id}
+  </select>
+  
+  <select id="selectUserNameByid" parameterType="Integer" resultType="User">
+     select u.user_name from t_user u where u.user_id=#{user_id}
+  </select>
+  
+  <select id="findEmailByid" parameterType="Integer" resultType="User">
+     select u.user_email from t_user u where u.user_id=#{user_id}
+  </select>
+</mapper>

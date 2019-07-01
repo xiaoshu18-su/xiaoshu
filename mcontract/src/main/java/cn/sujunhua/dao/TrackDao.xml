@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.sujunhua.dao.TrackDao"> 
+     <!-- 开启二级缓存 -->
+<!--  <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+ <!-- 定义返回集合 -->
+	<resultMap type="Track" id="selecttrack">
+		<id column="track_id" property="track_id" />
+		<result column="track_userid" property="track_userid" />
+		<result column="track_user" property="track_user" />
+		<result column="track_contractid" property="track_contractid" />
+		<result column="track_partb" property="track_partb" />
+		<result column="track_money" property="track_money" />
+		<result column="track_collectiondate"
+			property="track_collectiondate" />
+		<result column="track_amountreceived"
+			property="track_amountreceived" />
+		<result column="tract_accumulatedreceipts"
+			property="tract_accumulatedreceipts" />
+		<result column="tract_accumulatedarrears"
+			property="tract_accumulatedarrears" />
+		<result column="tract_remarks" property="tract_remarks" />
+		<association property="user"
+			javaType="cn.sujunhua.pojo.User">
+			<id column="user_id" property="user_id" />
+			<result column="user_name" property="user_name" />
+		</association>
+	</resultMap>
+ <!-- selectTrackByContractid -->
+ <select id="selectTrackByContractid" parameterType="String" resultMap="selecttrack">
+    SELECT t.*,u.* 
+    from t_track t 
+    LEFT OUTER JOIN t_user u
+    ON t.track_userid=u.user_id
+    WHERE t.track_contractid=#{track_contractid}
+ </select>
+ 
+ <insert id="addTract" parameterType="Track">
+    INSERT INTO t_track(
+	track_userid,
+	track_user,
+	track_contractid,
+	track_partb,
+	track_money,
+	track_collectiondate,
+	track_amountreceived,
+	tract_accumulatedreceipts,
+	tract_accumulatedarrears,
+	tract_remarks
+	)
+	values(
+	 #{track_userid},
+	 #{track_user},
+	 #{track_contractid},
+	 #{track_partb},
+	 #{track_money},
+	 #{track_collectiondate},
+     #{track_amountreceived},
+     #{tract_accumulatedreceipts},
+	 #{tract_accumulatedarrears},
+	 #{tract_remarks}
+	)
+ </insert>
+</mapper>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.sujunhua.dao.UsertypeDao">
+     <!-- 开启二级缓存 -->
+ <cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+ <!-- 查询出类型 -->  
+ <select id="selectUsertype" parameterType="String" resultType="Usertype">
+    select * from t_usertype
+    <where>
+       <if test="usertype_name != null">
+         usertype_name like "%"#{usertype_name}"%"
+       </if>
+    </where>
+ </select>   
+ <select id="selectNameByid" parameterType="Integer" resultType="Usertype">
+    select * from t_usertype where usertype_id=#{usertype_id}
+ </select>
+ <!-- selectUserByName -->
+ <select id="selectUserByName" parameterType="String" resultType="Usertype">
+    select * from t_usertype where usertype_name=#{usertype_name}
+ </select>
+</mapper>

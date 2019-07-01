@@ -1,0 +1,19 @@
+<ehcache>
+    <!-- 磁盘保存路径 -->
+    <diskStore path="D:/mybatis-cache"/>
+    
+    <!-- 默认缓存设置
+      maxElementsInMemory：内存可以存10000条数据
+      eternal：是否永久保存
+      timeToIdleSeconds：超时时间，默认秒
+      timeToLiveSeconds：默认有效时间 ，默认秒
+      overflowToDisk：超出内存是否保存到自盘   rtue  是
+     -->
+    <defaultCache
+        maxElementsInMemory="10000"
+        eternal="false"
+        timeToIdleSeconds="3600"
+        timeToLiveSeconds="3600"
+        overflowToDisk="true"
+        />
+</ehcache>
