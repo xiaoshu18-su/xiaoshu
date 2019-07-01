@@ -20,5 +20,15 @@
 	<mvc:resources location="/jsp/" mapping="/jsp/**"/>
  
   <bean name="/mvccontroller" class="cn.sujunhua.controller.MvcConrtroller"></bean>
+  
+  <bean id="methodNameResolver" 
+  class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+     <property name="paramName" value="do"/>
+     <property name="defaultMethodName" value="defaultMethod"/>
+  </bean>
+  
+  <bean name="/studentcontroller" class="cn.sujunhua.controller.StudentController">
+     <property name="methodNameResolver" ref="methodNameResolver"/>
+  </bean>
  
 </beans>
